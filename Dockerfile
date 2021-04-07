@@ -1,7 +1,7 @@
 FROM debian:buster-slim
 RUN apt update -y
-RUN apt install -y libboost-python-dev libqt4-dev python-pip cmake python git
-RUN pip install --no-input pydub numpy
+RUN apt install -y libboost-python-dev libqt4-dev python-pip cmake python git python-numpy
+RUN pip install --no-input pydub
 RUN git clone https://github.com/ManaZeak/pymoodbar
 WORKDIR /pymoodbar
 RUN mkdir build
