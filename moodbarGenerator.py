@@ -13,6 +13,11 @@ METADATA_OUTPUT_FOLDER = os.environ['METADATA_FOLDER']
 
 # Generates the moodbars for all the files in a folder.
 def genMoodbars():
+    # Creating the outputs folders.
+    if not os.path.exists(join(METADATA_OUTPUT_FOLDER, 'std')):
+        os.mkdir(join(METADATA_OUTPUT_FOLDER, 'std'))
+    if not os.path.exists(join(METADATA_OUTPUT_FOLDER, 'large')):
+        os.mkdir(join(METADATA_OUTPUT_FOLDER, 'large'))
     for root, _, files in os.walk(LIBRARY_FOLDER):
         for name in files:
             if name.endswith('mp3') or name.endswith('flac'):
@@ -23,17 +28,17 @@ def genMoodbars():
 def processFile(filePath):
     # Generating the MD5 of the file and the moodbar path.
     filename_md5 = md5(filePath.encode("ascii", "ignore")).hexdigest()
-    moodbarPath = join(MOOD_OUTPUT_FOLDER, '{}.png'.format(filename_md5))
-    metadataPath = join(METADATA_OUTPUT_FOLDER, '{}.txt'.format(filename_md5))
+    metadataPathNormal = join(METADATA_OUTPUT_FOLDER, 'std', '{}.txt'.format(filename_md5))
+    metadataPathLarge = join(METADATA_OUTPUT_FOLDER, 'large', '{}.txt'.format(filename_md5))
 
     # Check if the moodbar was generated previously
-    if os.path.exists(moodbarPath):
+    if os.path.exists(metadataPathNormal):
         return
     # Launching the moodbar rendering
-#    os.system(
-#        'python3 moodtool.py {} {} {} {} {}'.format(quote(filePath), quote(moodbarPath), 1000, 50, metadataPath))
     os.system(
-        'python3 moodtool.py -i {} -o {} -w {} -p {} -c {}'.format(quote(filePath), metadataPath, 1000, quote(moodbarPath), 50))
+        'python3 moodtool.py -i {} -o {} -w {} -s true'.format(quote(filePath), metadataPathNormal, 1000))
+    os.system(
+        'python3 moodtool.py -i {} -o {} -w {} -s true'.format(quote(filePath), metadataPathLarge, 2000))
 
 
 if __name__ == '__main__':
