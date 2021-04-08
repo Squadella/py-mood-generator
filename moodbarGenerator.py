@@ -30,8 +30,10 @@ def processFile(filePath):
     if os.path.exists(moodbarPath):
         return
     # Launching the moodbar rendering
+#    os.system(
+#        'python3 moodtool.py {} {} {} {} {}'.format(quote(filePath), quote(moodbarPath), 1000, 50, metadataPath))
     os.system(
-        'python3 moodtool.py {} {} {} {} {}'.format(quote(filePath), quote(moodbarPath), 1000, 50, metadataPath))
+        'python3 moodtool.py -i {} -o {} -w {} -p {} -c {}'.format(quote(filePath), metadataPath, 1000, quote(moodbarPath), 50))
 
 
 if __name__ == '__main__':
