@@ -2,14 +2,24 @@
 # coding: utf-8
 import os
 from hashlib import md5
+from multiprocessing import Pool
 from os.path import join
 from shlex import quote
+import time
 
 
 # Getting the variables from the environment variables
 MOOD_OUTPUT_FOLDER = os.environ['MOOD_OUTPUT_FOLDER']
 LIBRARY_FOLDER = os.environ['LIBRARY_FOLDER']
 METADATA_OUTPUT_FOLDER = os.environ['METADATA_FOLDER']
+
+
+# Return the list of all the path of the songs.
+def scanLibrary():
+    for root, _, files in os.walk(LIBRARY_FOLDER):
+        for name in files:
+            if name.endswith('mp3') or name.endswith('flac'):
+                yield join(root, name)
 
 
 # Generates the moodbars for all the files in a folder.
@@ -22,10 +32,10 @@ def genMoodbars():
     if not os.path.exists(join(METADATA_OUTPUT_FOLDER, 'hd')):
         os.mkdir(join(METADATA_OUTPUT_FOLDER, 'hd'))
     # Iterate over files to generates moodbar only for .mp3/.flac files
-    for root, _, files in os.walk(LIBRARY_FOLDER):
-        for name in files:
-            if name.endswith('mp3') or name.endswith('flac'):
-                processFile(join(root, name))
+    processNumber = os.cpu_count() - 2
+
+    with Pool(processes=processNumber) as p:
+        p.map(processFile, scanLibrary())
 
 
 # Process a file to generate the moodbar.
@@ -49,4 +59,7 @@ def processFile(filePath):
 
 
 if __name__ == '__main__':
-    genMoodbars()
+    while True:
+        genMoodbars()
+        time.sleep(3600)
+
