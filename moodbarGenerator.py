@@ -7,7 +7,6 @@ from os.path import join
 from shlex import quote
 import time
 
-
 # Getting the variables from the environment variables
 MOOD_OUTPUT_FOLDER = os.environ['MOOD_OUTPUT_FOLDER']
 LIBRARY_FOLDER = os.environ['LIBRARY_FOLDER']
@@ -42,24 +41,24 @@ def genMoodbars():
 def processFile(filePath):
     # Generating the MD5 of the file and the moodbar path.
     md5Filename = md5(filePath.encode('ascii', 'ignore')).hexdigest()
+
+    rawmoodFile = '{}.rawmood'.format(md5Filename)
     # .rawmood is basically a txt file with an array of width * 3, for each RGB sample value
-    metadataPathSmall = join(METADATA_OUTPUT_FOLDER, 'ld', '{}.rawmood'.format(md5Filename))
-    metadataPathNormal = join(METADATA_OUTPUT_FOLDER, 'std', '{}.rawmood'.format(md5Filename))
-    metadataPathLarge = join(METADATA_OUTPUT_FOLDER, 'hd', '{}.rawmood'.format(md5Filename))
+    metadataPathSmall = join(METADATA_OUTPUT_FOLDER, 'ld', rawmoodFile)
+    metadataPathNormal = join(METADATA_OUTPUT_FOLDER, 'std', rawmoodFile)
+    metadataPathLarge = join(METADATA_OUTPUT_FOLDER, 'hd', rawmoodFile)
     # Check if the moodbar was generated previously
     if os.path.exists(metadataPathNormal):
         return
+
+    command = 'python3 moodtool.py -i {} -o {} -w {} -s'
     # Launching the moodbar rendering for low definition, standard definition and high definition
-    os.system(
-        'python3 moodtool.py -i {} -o {} -w {} -s'.format(quote(filePath), metadataPathSmall, 500))
-    os.system(
-        'python3 moodtool.py -i {} -o {} -w {} -s'.format(quote(filePath), metadataPathNormal, 1000))
-    os.system(
-        'python3 moodtool.py -i {} -o {} -w {} -s'.format(quote(filePath), metadataPathLarge, 2000))
+    os.system(command.format(quote(filePath), metadataPathSmall, 500))
+    os.system(command.format(quote(filePath), metadataPathNormal, 1000))
+    os.system(command.format(quote(filePath), metadataPathLarge, 2000))
 
 
 if __name__ == '__main__':
     while True:
         genMoodbars()
         time.sleep(3600)
-
